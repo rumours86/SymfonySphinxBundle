@@ -1,13 +1,13 @@
 <?php
 
-namespace Javer\SphinxBundle\Logger;
+namespace Pluk77\SymfonySphinxBundle\Logger;
 
 use Psr\Log\LoggerInterface;
 
 /**
  * Class SphinxLogger
  *
- * @package Javer\SphinxBundle\Logger
+ * @package Pluk77\SymfonySphinxBundle\Logger
  */
 class SphinxLogger
 {

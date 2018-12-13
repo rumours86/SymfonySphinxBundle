@@ -1,8 +1,8 @@
 <?php
 
-namespace Javer\SphinxBundle\DataCollector;
+namespace Pluk77\SymfonySphinxBundle\DataCollector;
 
-use Javer\SphinxBundle\Logger\SphinxLogger;
+use Pluk77\SymfonySphinxBundle\Logger\SphinxLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 /**
  * Class SphinxDataCollector
  *
- * @package Javer\SphinxBundle\DataCollector
+ * @package Pluk77\SymfonySphinxBundle\DataCollector
  */
 class SphinxDataCollector extends DataCollector
 {

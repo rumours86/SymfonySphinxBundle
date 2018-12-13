@@ -1,20 +1,41 @@
 <?php
 
-namespace Javer\SphinxBundle\Sphinx;
+namespace Pluk77\SymfonySphinxBundle\Sphinx;
 
 use Doctrine\ORM\QueryBuilder;
-use Javer\SphinxBundle\Logger\SphinxLogger;
+use Pluk77\SymfonySphinxBundle\Logger\SphinxLogger;
 use PDO;
 use PDOStatement;
 
 /**
  * Class Query
  *
- * @package Javer\SphinxBundle\Sphinx
+ * @package Pluk77\SymfonySphinxBundle\Sphinx
  */
 class Query
 {
     protected const CONDITION_OPERATORS = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN'];
+    
+    const META_STATEMENT = 'SHOW META';
+    
+    /**
+     * A query object is in CLEAN state when it has NO unparsed/unprocessed DQL parts.
+     */
+    const STATE_CLEAN  = 1;
+
+    /**
+     * A query object is in state DIRTY when it has DQL parts that have not yet been
+     * parsed/processed. This is automatically defined as DIRTY when addDqlQueryPart
+     * is called.
+     */
+    const STATE_DIRTY = 2;
+    
+    /**
+     * The current state of this query.
+     *
+     * @var integer
+     */
+    private $_state = self::STATE_DIRTY;
 
     /**
      * @var PDO
@@ -141,6 +162,7 @@ class Query
      */
     public function useQueryBuilder(QueryBuilder $queryBuilder, string $alias, string $column = 'id')
     {
+        $this->_state = self::STATE_DIRTY;
         $this->queryBuilder = clone $queryBuilder;
         $this->queryBuilderAlias = $alias;
         $this->queryBuilderColumn = $column;
@@ -161,6 +183,7 @@ class Query
      */
     public function setQuery(string $query)
     {
+        $this->_state = self::STATE_DIRTY;
         $this->query = $query;
 
         return $this;
@@ -175,6 +198,7 @@ class Query
      */
     public function select(...$columns)
     {
+        $this->_state = self::STATE_DIRTY;
         $this->select = array_merge($this->select, $columns ?: ['*']);
 
         return $this;
@@ -189,6 +213,7 @@ class Query
      */
     public function from(...$indexes)
     {
+        $this->_state = self::STATE_DIRTY;
         $this->from = array_merge($this->from, $indexes);
 
         return $this;
@@ -207,6 +232,8 @@ class Query
      */
     protected function createCondition(string $column, $operator, $value = null)
     {
+        $this->_state = self::STATE_DIRTY;
+        
         if (is_null($value)) {
             $value = $operator;
             $operator = is_array($value) ? 'IN' : '=';
@@ -238,11 +265,27 @@ class Query
      *
      * @return Query
      */
-    public function where(string $column, $operator, $value = null)
+    public function andWhere(string $column, $operator, $value = null)
     {
         $this->where[] = $this->createCondition($column, $operator, $value);
 
         return $this;
+    }
+    
+    /**
+     * WHERE clause.
+     *
+     * @param string $column
+     * @param mixed  $operator
+     * @param mixed  $value
+     *
+     * @return Query
+     */
+    public function where(string $column, $operator, $value = null)
+    {
+        $this->where = [];
+
+        return $this->andWhere($column, $operator, $value);
     }
 
     /**
@@ -254,15 +297,47 @@ class Query
      *
      * @return Query
      */
-    public function match($column, $value, bool $safe = false)
+    public function andMatch($column, $value, bool $safe = false)
     {
+        $this->_state = self::STATE_DIRTY;
         $this->match[] = [$column, $value, $safe];
 
         return $this;
     }
+    
+    /**
+     * MATCH clause.
+     *
+     * @param string|string[] $column
+     * @param string          $value
+     * @param boolean         $safe
+     *
+     * @return Query
+     */
+    public function match($column, $value, bool $safe = false)
+    {
+        $this->match = [];
+        
+        return $this->andMatch($column, $value, $safe);
+    }
 
     /**
-     * Group by column.
+     * and GROUP BY column.
+     *
+     * @param string $column
+     *
+     * @return Query
+     */
+    public function andGroupBy(string $column)
+    {
+        $this->_state = self::STATE_DIRTY;
+        $this->groupBy[] = $column;
+
+        return $this;
+    }
+    
+    /**
+     * GROUP BY column.
      *
      * @param string $column
      *
@@ -270,11 +345,30 @@ class Query
      */
     public function groupBy(string $column)
     {
-        $this->groupBy[] = $column;
+        $this->groupBy = [];
+        
+        return $this->andGroupBy($column);
+    }
+
+    /**
+     * and Within group order by column.
+     *
+     * @param string      $column
+     * @param string|null $direction
+     *
+     * @return Query
+     */
+    public function andWithinGroupOrderBy(string $column, $direction = null)
+    {
+        $this->_state = self::STATE_DIRTY;
+        $this->withinGroupOrderBy[] = [
+            $column,
+            (!is_null($direction) && strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC'
+        ];
 
         return $this;
     }
-
+    
     /**
      * Within group order by column.
      *
@@ -285,12 +379,9 @@ class Query
      */
     public function withinGroupOrderBy(string $column, $direction = null)
     {
-        $this->withinGroupOrderBy[] = [
-            $column,
-            (!is_null($direction) && strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC'
-        ];
-
-        return $this;
+        $this->withinGroupOrderBy = [];
+        
+        return $this->andWithinGroupOrderBy($column, $direction);
     }
 
     /**
@@ -302,15 +393,50 @@ class Query
      *
      * @return Query
      */
-    public function having(string $column, $operator, $value = null)
+    public function andHaving(string $column, $operator, $value = null)
     {
         $this->having[] = $this->createCondition($column, $operator, $value);
 
         return $this;
     }
+    
+    /**
+     * HAVING clause.
+     *
+     * @param string $column
+     * @param mixed  $operator
+     * @param mixed  $value
+     *
+     * @return Query
+     */
+    public function having(string $column, $operator, $value = null)
+    {
+        $this->having = [];
+        
+        return $this->andHaving($column, $operator, $value);
+    }
 
     /**
-     * Order by column.
+     * And ORDER BY column.
+     *
+     * @param string      $column
+     * @param string|null $direction
+     *
+     * @return Query
+     */
+    public function andOrderBy(string $column, $direction = null)
+    {
+        $this->_state = self::STATE_DIRTY;
+        $this->orderBy[] = [
+            $column,
+            (!is_null($direction) && strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC'
+        ];
+
+        return $this;
+    }
+    
+    /**
+     * ORDER BY column.
      *
      * @param string      $column
      * @param string|null $direction
@@ -319,64 +445,37 @@ class Query
      */
     public function orderBy(string $column, $direction = null)
     {
-        $this->orderBy[] = [
-            $column,
-            (!is_null($direction) && strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC'
-        ];
-
-        return $this;
+        $this->orderBy = [];
+        
+        return $this->andOrderBy($column, $direction);
     }
 
     /**
-     * Set offset.
+     * Sets the position of the first result to retrieve (the "offset").
      *
-     * @param integer $offset
+     * @param integer $firstResult The first result to return.
      *
-     * @return Query
-     *
-     * @throws \InvalidArgumentException
+     * @return Query This query object.
      */
-    public function offset(int $offset)
+    public function setFirstResult($firstResult)
     {
-        if ($offset < 0) {
-            throw new \InvalidArgumentException('Offset should be bigger or equal to zero');
-        }
-
-        $this->offset = $offset;
+        $this->_state = self::STATE_DIRTY;
+        $this->offset = $firstResult;
 
         return $this;
     }
-
+    
     /**
-     * Set limit.
+     * Sets the maximum number of results to retrieve (the "limit").
      *
-     * @param integer      $offset
-     * @param integer|null $limit
+     * @param integer|null $maxResults
      *
-     * @return Query
-     *
-     * @throws \InvalidArgumentException
+     * @return Query This query object.
      */
-    public function limit(int $offset, int $limit = null)
+    public function setMaxResults($maxResults)
     {
-        if (!is_null($limit)) {
-            if ($offset < 0) {
-                throw new \InvalidArgumentException('Offset should be bigger or equal to zero');
-            }
-
-            if ($limit <= 0) {
-                throw new \InvalidArgumentException('Limit should be positive');
-            }
-
-            $this->limit = $limit;
-            $this->offset = $offset;
-        } else {
-            if ($offset <= 0) {
-                throw new \InvalidArgumentException('Limit should be positive');
-            }
-
-            $this->limit = $offset;
-        }
+        $this->_state = self::STATE_DIRTY;
+        $this->limit = $maxResults;
 
         return $this;
     }
@@ -389,9 +488,26 @@ class Query
      *
      * @return Query
      */
-    public function option(string $name, string $value)
+    public function addOption(string $name, string $value)
     {
+        $this->_state = self::STATE_DIRTY;
         $this->option[] = [$name, $value];
+
+        return $this;
+    }
+    
+    /**
+     * Set option.
+     *
+     * @param string $name
+     * @param string $value
+     *
+     * @return Query
+     */
+    public function setOption(string $name, string $value)
+    {
+        $this->option = [];
+        $this->addOption($name, $value);
 
         return $this;
     }
@@ -433,11 +549,13 @@ class Query
      *
      * @return string
      */
-    public function getQuery(): string
+    public function getSQL(): string
     {
-        if (is_null($this->query)) {
-            $this->query = $this->buildQuery();
+        if($this->_state === self::STATE_CLEAN && $this->query) {
+            return $this->query;
         }
+        
+        $this->query = $this->buildQuery();
 
         return $this->query;
     }
@@ -458,7 +576,7 @@ class Query
         if (!$this->from) {
             throw new \InvalidArgumentException('You should add at least one FROM clause');
         }
-
+                
         $clauses = [];
 
         $clauses[] = 'SELECT ' . implode(', ', $this->select);
@@ -595,13 +713,11 @@ class Query
      */
     public function getResults(): array
     {
-        if (is_null($this->results)) {
-            $this->execute();
-
-            if ($this->queryBuilder) {
-                $this->results = $this->applyQueryBuilder($this->results);
-            }
+        if($this->_state === self::STATE_CLEAN) {
+            $this->results;
         }
+        
+        $this->execute();
 
         return $this->results;
     }
@@ -613,12 +729,16 @@ class Query
      */
     public function execute()
     {
+        if($this->_state === self::STATE_CLEAN) {
+            return $this->numRows;
+        }
+                
         $startTime = microtime(true);
 
         $this->results = [];
         $this->numRows = 0;
 
-        $stmt = $this->createStatement($this->getQuery());
+        $stmt = $this->createStatement($this->getSQL());
 
         if ($stmt->execute()) {
             if ($this->select) {
@@ -627,12 +747,21 @@ class Query
             $this->numRows = $stmt->rowCount();
 
             $stmt->closeCursor();
+            
+            $this->_state = self::STATE_CLEAN;
+            
+            $this->populateMetadata();
         }
 
         $endTime = microtime(true);
 
-        $this->logger->logQuery($this->getQuery(), $this->getNumRows(), $endTime - $startTime);
+        $this->logger->logQuery($this->getSQL(), $this->getNumRows(), $endTime - $startTime);
+        $this->logger->logQuery(self::META_STATEMENT, $this->getTotalFound(), $this->getTime());
 
+        if ($this->queryBuilder) {
+            $this->results = $this->applyQueryBuilder($this->results);
+        }
+        
         return $this->numRows;
     }
 
@@ -645,7 +774,7 @@ class Query
      */
     public function getNumRows(): int
     {
-        if (is_null($this->numRows)) {
+        if ($this->_state === self::STATE_DIRTY) {
             throw new \BadMethodCallException('You must execute query before getting number of affected rows');
         }
 
@@ -705,6 +834,17 @@ class Query
 
         return array_values($results);
     }
+    
+    private function populateMetadata() {
+        
+        $this->metadata = [];
+        $stmt = $this->createStatement(self::META_STATEMENT);
+
+        if ($stmt->execute()) {
+            $this->metadata = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+            $stmt->closeCursor();
+        }
+    }
 
     /**
      * Returns query result metadata.
@@ -718,20 +858,12 @@ class Query
         if (!is_null($this->metadata)) {
             return $this->metadata;
         }
-
+        
         if (is_null($this->results)) {
             throw new \BadMethodCallException('You can get metadata only after executing query');
         }
-
-        $this->metadata = [];
-        $stmt = $this->createStatement('SHOW META');
-
-        if ($stmt->execute()) {
-            $this->metadata = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-            $stmt->closeCursor();
-        }
-
-        return $this->metadata;
+        
+        return [];
     }
 
     /**
@@ -768,15 +900,21 @@ class Query
     {
         return (float) $this->getMetadataValue('time', 0);
     }
+    
+    public function clearResult() {
+        $this->_state = self::STATE_DIRTY;
+        $this->query = null;
+        $this->result = null;
+        $this->metadata = null;
+        $this->numRows = null;
+    }
 
     /**
      * Clones the current object.
      */
     public function __clone()
     {
-        $this->results = null;
-        $this->numRows = null;
-        $this->metadata = null;
+        $this->clearResult();
 
         if ($this->queryBuilder) {
             $this->queryBuilder = clone $this->queryBuilder;
@@ -800,6 +938,6 @@ class Query
      */
     public function __toString()
     {
-        return $this->getQuery();
+        return $this->getSQL();
     }
 }

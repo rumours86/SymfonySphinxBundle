@@ -1,6 +1,6 @@
 <?php
 
-namespace Javer\SphinxBundle\DependencyInjection;
+namespace Pluk77\SymfonySphinxBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -8,11 +8,11 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * Class JaverSphinxExtension
+ * Class SymfonySphinxExtension
  *
- * @package Javer\SphinxBundle\DependencyInjection
+ * @package Pluk77\SymfonySphinxBundle\DependencyInjection
  */
-class JaverSphinxExtension extends Extension
+class SymfonySphinxExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -25,10 +25,7 @@ class JaverSphinxExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('javer_sphinx.host', $config['host']);
-        $container->setParameter('javer_sphinx.port', $config['port']);
-        $container->setParameter('javer_sphinx.config_path', $config['config_path']);
-        $container->setParameter('javer_sphinx.data_dir', $config['data_dir']);
-        $container->setParameter('javer_sphinx.searchd_path', $config['searchd_path']);
+        $container->setParameter('sphinx.host', $config['host']);
+        $container->setParameter('sphinx.port', $config['port']);
     }
 }

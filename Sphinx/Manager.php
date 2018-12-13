@@ -1,14 +1,14 @@
 <?php
 
-namespace Javer\SphinxBundle\Sphinx;
+namespace Pluk77\SymfonySphinxBundle\Sphinx;
 
-use Javer\SphinxBundle\Logger\SphinxLogger;
+use Pluk77\SymfonySphinxBundle\Logger\SphinxLogger;
 use PDO;
 
 /**
  * Class Manager
  *
- * @package Javer\SphinxBundle\Sphinx
+ * @package Pluk77\SymfonySphinxBundle\Sphinx
  */
 class Manager
 {

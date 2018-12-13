@@ -1,16 +1,22 @@
 {
-    "name": "javer/sphinx-bundle",
+    "name": "pluk77/symfonySphinxBundle",
     "type": "symfony-bundle",
-    "description": "Provides integration of Sphinx search engine with Symfony using SphinxQL",
-    "keywords": ["sphinx", "sphinxql", "search", "symfony", "symfony2", "doctrine2"],
-    "homepage": "https://github.com/javer",
+    "description": "Provides integration of Sphinx search engine with Symfony4 using SphinxQL",
+    "keywords": ["sphinx", "sphinxql", "search", "symfony", "symfony4", "doctrine2"],
+    "homepage": "https://github.com/pluk77",
     "license": "MIT",
     "authors": [
         {
             "name": "Vadim Borodavko",
             "email": "vadim.borodavko@gmail.com",
             "homepage": "https://github.com/javer"
+        },
+		{
+            "name": "Marcel Berteler",
+            "email": "pluk77@gmail.com",
+            "homepage": "https://github.com/pluk77"
         }
+		
     ],
     "require": {
         "php": ">=7.1"
@@ -20,18 +26,15 @@
     },
     "suggest": {
         "doctrine/orm": "to allow usage with Doctrine ORM",
-        "knplabs/knp-paginator-bundle": "to allow usage with Knp Paginator",
-        "behat/behat": "to be able to test search",
-        "behat/symfony2-extension": "to be able to test search"
     },
     "autoload": {
         "psr-4": {
-            "Javer\\SphinxBundle\\": ""
+            "pluk77\\SymfonySphinxBundle\\": ""
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.1.x-dev"
+            "dev-master": "1.0.x-dev"
         }
     }
 }

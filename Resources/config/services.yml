@@ -1,65 +1,28 @@
-parameters:
-    sphinx.manager.class: Javer\SphinxBundle\Sphinx\Manager
-    sphinx.daemon.class: Javer\SphinxBundle\Sphinx\Daemon
-    sphinx.daemon.timeout.start: 1
-    sphinx.daemon.timeout.stop: 3
-    sphinx.event.subscriber.paginate.class: Javer\SphinxBundle\Event\Subscriber\PaginateSphinxQuerySubscriber
-    sphinx.logger.class: Javer\SphinxBundle\Logger\SphinxLogger
-    sphinx.data_collector.class: Javer\SphinxBundle\DataCollector\SphinxDataCollector
-    sphinx.converter.mysql_to_realtime.class: Javer\SphinxBundle\Converter\MysqlToRealtimeIndexConverter
-    sphinx.converter.mysql_to_realtime.class.index_options_blacklist:
-        - type
-        - source
-        - path
-    sphinx.loader.doctrine.class: Javer\SphinxBundle\Loader\DoctrineDataLoader
-
-services:
-    sphinx:
-        class: "%sphinx.manager.class%"
-        public: true
-        arguments:
-            - "@sphinx.logger"
-            - "%javer_sphinx.host%"
-            - "%javer_sphinx.port%"
-
-    sphinx.event.subscriber.paginate:
-        class: "%sphinx.event.subscriber.paginate.class%"
-        tags:
-            - { name: knp_paginator.subscriber }
-
-    sphinx.logger:
-        class: "%sphinx.logger.class%"
+services:        
+    Pluk77\SymfonySphinxBundle\Logger\SphinxLogger:
+        autowire: true
         arguments:
             - "@?logger"
         tags:
             - { name: monolog.logger, channel: sphinx }
-
-    sphinx.data_collector:
-        class: "%sphinx.data_collector.class%"
+            
+    sphinx.logger: '@Pluk77\SymfonySphinxBundle\Logger\SphinxLogger'
+    
+    Pluk77\SymfonySphinxBundle\DataCollector\SphinxDataCollector:
+        autowire: true
         arguments:
-            - "@sphinx.logger"
+            - '@Pluk77\SymfonySphinxBundle\Logger\SphinxLogger'
         tags:
-            - { name: data_collector, template: "@JaverSphinx/Collector/sphinx.html.twig", id: sphinx }
-
-    sphinx.daemon:
-        class: "%sphinx.daemon.class%"
+            - { name: data_collector, template: '@SymfonySphinxBundle/Collector/sphinx.html.twig', id: sphinx }
+            
+    sphinx.data_collector: '@Pluk77\SymfonySphinxBundle\DataCollector\SphinxDataCollector'
+    
+    Pluk77\SymfonySphinxBundle\Sphinx\Manager:
+        public: true
+        autowire: true
         arguments:
-            - "%javer_sphinx.searchd_path%"
-            - "%javer_sphinx.config_path%"
-            - "%javer_sphinx.data_dir%/searchd.pid"
-            - "%sphinx.daemon.timeout.start%"
-            - "%sphinx.daemon.timeout.stop%"
+            - '@sphinx.logger'
+            - '%sphinx.host%'
+            - '%sphinx.port%'
 
-    sphinx.converter.mysql_to_realtime:
-        class: "%sphinx.converter.mysql_to_realtime.class%"
-        arguments:
-            - "%javer_sphinx.port%"
-            - "%javer_sphinx.data_dir%"
-            - "%javer_sphinx.data_dir%/searchd.pid"
-            - "%sphinx.converter.mysql_to_realtime.class.index_options_blacklist%"
-
-    sphinx.loader.doctrine:
-        class: "%sphinx.loader.doctrine.class%"
-        arguments:
-            - "@sphinx"
-            - "@?database_connection"
+    sphinx.manager: '@Pluk77\SymfonySphinxBundle\Sphinx\Manager' 
