@@ -1,5 +1,5 @@
 {
-    "name": "pluk77/symfonySphinxBundle",
+    "name": "pluk77/symfony-sphinx-bundle",
     "type": "symfony-bundle",
     "description": "Provides integration of Sphinx search engine with Symfony4 using SphinxQL",
     "keywords": ["sphinx", "sphinxql", "search", "symfony", "symfony4", "doctrine2"],
