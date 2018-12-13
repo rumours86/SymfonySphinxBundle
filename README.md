@@ -89,15 +89,6 @@ $query = $sphinx->createQuery()
 	->setOption('field_weights', '(last_name=10, first_name=5)')
 	->useQueryBuilder($queryBuilder, 'p', 'id');
 	
-$query = $this->container->get('sphinx')
-    ->createQuery()
-    ->select('*')
-    ->from('product')
-    ->match(['name', 'description'], $searchQuery)
-    ->where('owner_id', $this->getUser()->getId())
-    ->orderBy('created', 'desc')
-    ->useQueryBuilder($queryBuilder, 'p');
-	
 $results = $query->getResults();
 
 ```

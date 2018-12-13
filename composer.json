@@ -25,7 +25,7 @@
         "phpunit/phpunit": ">=4.0,<6.0"
     },
     "suggest": {
-        "doctrine/orm": "to allow usage with Doctrine ORM",
+        "doctrine/orm": "to allow usage with Doctrine ORM"
     },
     "autoload": {
         "psr-4": {
