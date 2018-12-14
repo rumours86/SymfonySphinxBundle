@@ -1,11 +1,11 @@
 <?php
 
-namespace Javer\SphinxBundle\Config;
+namespace Pluk77\SymfonySphinxBundle\Config;
 
 /**
  * Class Config
  *
- * @package Javer\SphinxBundle\Config
+ * @package Pluk77\SymfonySphinxBundle\Config
  */
 class Config
 {

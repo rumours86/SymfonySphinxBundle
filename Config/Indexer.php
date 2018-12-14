@@ -1,11 +1,11 @@
 <?php
 
-namespace Javer\SphinxBundle\Config;
+namespace Pluk77\SymfonySphinxBundle\Config;
 
 /**
  * Class Indexer
  *
- * @package Javer\SphinxBundle\Config
+ * @package Pluk77\SymfonySphinxBundle\Config
  */
 class Indexer extends Block
 {

@@ -13,7 +13,7 @@ services:
         arguments:
             - '@Pluk77\SymfonySphinxBundle\Logger\SphinxLogger'
         tags:
-            - { name: data_collector, template: '@SymfonySphinxBundle/Collector/sphinx.html.twig', id: sphinx }
+            - { name: data_collector, template: '@SymfonySphinx/Collector/sphinx.html.twig', id: sphinx }
             
     sphinx.data_collector: '@Pluk77\SymfonySphinxBundle\DataCollector\SphinxDataCollector'
     

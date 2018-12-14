@@ -1,11 +1,11 @@
 <?php
 
-namespace Javer\SphinxBundle\Config;
+namespace Pluk77\SymfonySphinxBundle\Config;
 
 /**
  * Class Source
  *
- * @package Javer\SphinxBundle\Config
+ * @package Pluk77\SymfonySphinxBundle\Config
  */
 class Source extends Block
 {
