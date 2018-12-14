@@ -1,14 +1,14 @@
 <?php
 
-namespace Javer\SphinxBundle\Tests\Sphinx;
+namespace Plu77\SymfonySphinxBundle\Tests\Sphinx;
 
-use Javer\SphinxBundle\Logger\SphinxLogger;
-use Javer\SphinxBundle\Sphinx\Query;
+use Plu77\SymfonySphinxBundle\Logger\SphinxLogger;
+use Plu77\SymfonySphinxBundle\Sphinx\Query;
 
 /**
  * Class QueryTest
  *
- * @package Javer\SphinxBundle\Tests\Sphinx
+ * @package Plu77\SymfonySphinxBundle\Tests\Sphinx
  */
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,24 +50,24 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->select('id', 'column1', 'column2', 'WEIGHT() as weight')
             ->from('index1', 'index2')
             ->where('column3', 'value1')
-            ->where('column4', '>', 4)
-            ->where('column5', [5, '6'])
-            ->where('column6', 'NOT IN', [7, '8'])
-            ->where('column7', 'BETWEEN', [9, 10])
+            ->andWhere('column4', '>', 4)
+            ->andWhere('column5', [5, '6'])
+            ->andWhere('column6', 'NOT IN', [7, '8'])
+            ->andWhere('column7', 'BETWEEN', [9, 10])
             ->match('column8', 'value2')
-            ->match(['column9', 'column10'], 'value3')
+            ->andMatch(['column9', 'column10'], 'value3')
             ->groupBy('column11')
-            ->groupBy('column12')
+            ->andGroupBy('column12')
             ->withinGroupOrderBy('column13', 'desc')
-            ->withinGroupOrderBy('column14')
+            ->andWithinGroupOrderBy('column14')
             ->having('weight', '>', 2)
             ->orderBy('column15', 'desc')
-            ->orderBy('column16')
-            ->offset('5')
-            ->limit(10)
-            ->option('agent_query_timeout', 10000)
-            ->option('max_matches', 1000)
-            ->option('field_weights', '(column9=10, column10=3)')
+            ->andOrderBy('column16')
+            ->setFirstResult(5)
+            ->setMaxResults(10)
+            ->setOption('agent_query_timeout', 10000)
+            ->addOption('max_matches', 1000)
+            ->addOption('field_weights', '(column9=10, column10=3)')
             ->getQuery();
 
         $expectedSql = 'SELECT id, column1, column2, WEIGHT() as weight'
