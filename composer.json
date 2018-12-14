@@ -6,15 +6,15 @@
     "homepage": "https://github.com/pluk77",
     "license": "MIT",
     "authors": [
-        {
-            "name": "Vadim Borodavko",
-            "email": "vadim.borodavko@gmail.com",
-            "homepage": "https://github.com/javer"
-        },
 		{
             "name": "Marcel Berteler",
             "email": "pluk77@gmail.com",
             "homepage": "https://github.com/pluk77"
+        },
+		{
+            "name": "Vadim Borodavko",
+            "email": "vadim.borodavko@gmail.com",
+            "homepage": "https://github.com/javer"
         }
 		
     ],

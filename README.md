@@ -23,27 +23,24 @@ Installation
 
 Install the bundle using composer:
 ```sh
-composer require javer/sphinx-bundle
+composer require pluk77/symfony-sphinx-bundle
 ```
 
 Configuration
 -------------
 
-Add to your ```app/config/config.yml``` the following options:
+Add to your ```config/package/symfony_sphinx.yml``` the following options:
 ```yml
-javer_sphinx:
+symfony_sphinx:
     host: 127.0.0.1
     port: 9306
 ```
 
 Full configuration with default values:
 ```yml
-javer_sphinx:
+symfony_sphinx:
     host: 127.0.0.1
     port: 9306
-    config_path: "%kernel.root_dir%/config/sphinx.conf"
-    data_dir: "%kernel.cache_dir%/sphinx"
-    searchd_path: searchd
 ```
 
 Usage

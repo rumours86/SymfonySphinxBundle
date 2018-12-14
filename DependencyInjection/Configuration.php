@@ -18,9 +18,8 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('sphinx');
-
-        $rootNode
+                
+        $treeBuilder->root('symfony_sphinx')
             ->children()
                 ->scalarNode('host')->defaultValue('127.0.0.1')->end()
                 ->scalarNode('port')->defaultValue(9306)->end()
