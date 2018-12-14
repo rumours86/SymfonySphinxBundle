@@ -1,14 +1,14 @@
 <?php
 
-namespace Javer\SphinxBundle;
+namespace Pluk77\SynmfonySphinxBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class JaverSphinxBundle
+ * Class SymfonySphinxBundle
  *
- * @package Javer\SphinxBundle
+ * @package PLuk77\SymfonySphinxBundle
  */
-class JaverSphinxBundle extends Bundle
+class SymfonySphinxBundle extends Bundle
 {
 }
