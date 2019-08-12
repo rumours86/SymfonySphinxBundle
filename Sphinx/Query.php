@@ -714,7 +714,7 @@ class Query
     public function getResults(): array
     {
         if($this->_state === self::STATE_CLEAN) {
-            $this->results;
+            return $this->results;
         }
         
         $this->execute();
