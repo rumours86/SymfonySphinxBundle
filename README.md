@@ -3,7 +3,7 @@ SymfonySphinxBundle
 
 Forked from javer/JaverSphinxBundle
 
-This bundle provides integration of [Sphinx](http://sphinxsearch.com) search engine with Symfony4.
+This bundle provides integration of [Sphinx](http://sphinxsearch.com) or [Manticore](https://manticoresearch.com/) search engine with Symfony4+.
 
 Features:
 - SphinxQL Query Builder
@@ -17,6 +17,7 @@ Requirements
 
 - PHP 7.1+
 - pdo_mysql php extension
+- Symfony 4+
 
 Installation
 ------------
