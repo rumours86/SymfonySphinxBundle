@@ -25,4 +25,5 @@ services:
             - '%sphinx.host%'
             - '%sphinx.port%'
 
-    sphinx.manager: '@Pluk77\SymfonySphinxBundle\Sphinx\Manager' 
+    sphinx.manager:
+        class: Pluk77\SymfonySphinxBundle\Sphinx\Manager
